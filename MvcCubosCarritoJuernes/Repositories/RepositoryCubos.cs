@@ -111,21 +111,25 @@ namespace MvcCubosCarritoJuernes.Repositories
             return await consulta.ToListAsync();
         }
 
-        public async Task InsertCompraAsync(int id_cubo, int cantidad, int precio)
+        public async Task InsertCompraAsync(List<int> idscubos)
         {
             var consulta = from datos in this.context.Compras
                            select datos;
             int id_compra = consulta.Max(x => x.IdCompra) + 1;
             DateTime fechapedido = DateTime.Now;
+            int cantidad = 1;
 
-            string sql = "CALL SP_INSERT_COMPRA(@id_compra, @id_cubo, @cantidad, @precio, @fechapedido);";
-            MySqlParameter pamIdCompra = new MySqlParameter("@id_compra", id_compra);
-            MySqlParameter pamIdCubo = new MySqlParameter("@id_cubo", id_cubo);
-            MySqlParameter pamCantidad = new MySqlParameter("@cantidad", cantidad);
-            MySqlParameter pamPrecio = new MySqlParameter("@precio", precio);
-            MySqlParameter pamFechaPedido = new MySqlParameter("@fechapedido", fechapedido);
-
-            await this.context.Database.ExecuteSqlRawAsync(sql, pamIdCompra, pamIdCubo, pamCantidad, pamPrecio, pamFechaPedido);
+            foreach (int id_cubo in idscubos)
+            { 
+                int precio = this.context.Cubos.Where(x => x.IdCubo == id_cubo).Select(x => x.Precio).FirstOrDefault();
+                string sql = "CALL SP_INSERT_COMPRA(@id_compra, @id_cubo, @cantidad, @precio, @fechapedido);";
+                MySqlParameter pamIdCompra = new MySqlParameter("@id_compra", id_compra);
+                MySqlParameter pamIdCubo = new MySqlParameter("@id_cubo", id_cubo);
+                MySqlParameter pamCantidad = new MySqlParameter("@cantidad", cantidad);
+                MySqlParameter pamPrecio = new MySqlParameter("@precio", precio);
+                MySqlParameter pamFechaPedido = new MySqlParameter("@fechapedido", fechapedido);
+                await this.context.Database.ExecuteSqlRawAsync(sql, pamIdCompra, pamIdCubo, pamCantidad, pamPrecio, pamFechaPedido);
+            }
         }
     }
 }

@@ -157,11 +157,7 @@ namespace MvcCubosCarritoJuernes.Controllers
                 {
                     if(accion.ToLower() == "comprar")
                     {
-                        foreach(int idcubo in idsCubosList)
-                        {
-                            int precio = (await this.repo.FindCuboAsync(idcubo)).Precio;
-                            await this.repo.InsertCompraAsync(idcubo, 1, precio);
-                        }
+                        await this.repo.InsertCompraAsync(idsCubosList);
                         HttpContext.Session.Remove("IDSCUBOS");
                         return View();
                     }
