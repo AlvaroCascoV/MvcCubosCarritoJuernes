@@ -67,7 +67,7 @@ namespace MvcCubosCarritoJuernes.Controllers
             }
             cubo.Imagen = fileName;
             this.repo.UpdateCuboAsync(cubo.IdCubo, cubo.Nombre, cubo.Modelo, cubo.Marca, cubo.Imagen, cubo.Precio);
-            return RedirectToAction("Details", cubo.IdCubo);
+            return RedirectToAction("Index");
         }
     }
 }
