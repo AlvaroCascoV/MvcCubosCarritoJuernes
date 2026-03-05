@@ -1,14 +1,23 @@
-﻿
-@{
-    List<Cubo> favoritos = memoryCache.Get<List<Cubo>>("FAVORITOS");
-}
+﻿@model List<Cubo>
 
-<h1 style="color:blue">Cubos Favoritos</h1>
+<h1 style="color:coral">Carrito</h1>
 <p>
     <a asp-controller="Cubos" asp-action="Index">Volver a Cubos</a>
 </p>
 
-@if (favoritos != null)
+@if (Context.Session.GetString("IDSCUBOS") == null)
+{
+    <h2 style="color:green">No hay Cubos en el carrito</h2>
+}
+else
+{
+    <h4 style="color:red">@ViewData["PRECIOTOTAL"]</h4>
+    <p>
+        <a asp-controller="Cubos" asp-action="Carrito" asp-route-accion="comprar" class="btn btn-success">Comprar</a>
+    </p>
+}
+
+@if (Model != null)
 {
     <table class="table">
         <thead>
@@ -23,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in favoritos)
+            @foreach (var item in Model)
             {
                 <tr>
                     <td>@item.IdCubo</td>
@@ -35,14 +44,10 @@
                     </td>
                     <td>@item.Precio</td>
                     <td>
-                        <a asp-action="Favoritos" asp-controller="Cubos" asp-route-ideliminar=@item.IdCubo"" class="btn btn-danger">Delete</a>
+                        <a asp-action="Carrito" asp-controller="Cubos" asp-route-ideliminar="@item.IdCubo" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-}
-else
-{
-    <h4 style="color:red">No tenemos favoritos</h4>
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using MvcCoreUtilidades.Helpers;
+using MvcCubosCarritoJuernes.Extensions;
 using MvcCubosCarritoJuernes.Models;
 using MvcCubosCarritoJuernes.Repositories;
 
@@ -9,7 +10,7 @@ namespace MvcCubosCarritoJuernes.Controllers
     public class CubosController : Controller
     {
         IRepositoryCubos repo;
-        private HelperPathProvider helperPath; 
+        private HelperPathProvider helperPath;
         IMemoryCache memoryCache;
 
         public CubosController(IRepositoryCubos repo, HelperPathProvider helperPath, IMemoryCache memoryCache)
@@ -30,7 +31,7 @@ namespace MvcCubosCarritoJuernes.Controllers
             Cubo cubo = await this.repo.FindCuboAsync(idcubo);
             return View(cubo);
         }
-    
+
         public IActionResult Create()
         {
             return View();
@@ -75,7 +76,7 @@ namespace MvcCubosCarritoJuernes.Controllers
 
         public async Task<IActionResult> Almacenamiento(int? idfav, int? idcubo)
         {
-            if(idfav != null)
+            if (idfav != null)
             {
                 List<Cubo> cubosFavs;
                 if (this.memoryCache.Get("FAVORITOS") == null)
@@ -90,6 +91,22 @@ namespace MvcCubosCarritoJuernes.Controllers
                 cubosFavs.Add(cubo);
                 this.memoryCache.Set("FAVORITOS", cubosFavs);
             }
+
+            if (idcubo != null)
+            {
+                List<int> idsCubosList;
+                if (HttpContext.Session.GetObject<List<int>>("IDSCUBOS") == null)
+                {
+                    idsCubosList = new List<int>();
+                }
+                else
+                {
+                    idsCubosList = HttpContext.Session.GetObject<List<int>>("IDSCUBOS");
+                }
+                idsCubosList.Add(idcubo.Value);
+                HttpContext.Session.SetObject("IDSCUBOS", idsCubosList);
+            }
+
             return RedirectToAction("Index");
         }
         public IActionResult Favoritos(int? ideliminar)
@@ -97,11 +114,11 @@ namespace MvcCubosCarritoJuernes.Controllers
             if (ideliminar != null)
             {
                 List<Cubo> cubosFavs = this.memoryCache.Get<List<Cubo>>("FAVORITOS");
-                
+
                 Cubo cuboEliminar = cubosFavs.Find(x => x.IdCubo == ideliminar.Value);
                 cubosFavs.Remove(cuboEliminar);
 
-                if(cubosFavs.Count == 0)
+                if (cubosFavs.Count == 0)
                 {
                     this.memoryCache.Remove("FAVORITOS");
                 }
@@ -111,6 +128,49 @@ namespace MvcCubosCarritoJuernes.Controllers
                 }
             }
             return View();
+        }
+
+        public async Task<IActionResult> Carrito(int? ideliminar, string? accion)
+        {
+            List<int> idsCubosList = HttpContext.Session.GetObject<List<int>>("IDSCUBOS");
+            if (idsCubosList == null)
+            {
+                return View();
+            }
+            else
+            {
+                if (ideliminar != null)
+                {
+                    idsCubosList.Remove(ideliminar.Value);
+                    if (idsCubosList.Count == 0)
+                    {
+                        HttpContext.Session.Remove("IDSCUBOS");
+                        return View();
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetObject("IDSCUBOS", idsCubosList);
+                    }
+                }
+
+                if(accion != null)
+                {
+                    if(accion.ToLower() == "comprar")
+                    {
+                        foreach(int idcubo in idsCubosList)
+                        {
+                            int precio = (await this.repo.FindCuboAsync(idcubo)).Precio;
+                            await this.repo.InsertCompraAsync(idcubo, 1, precio);
+                        }
+                        HttpContext.Session.Remove("IDSCUBOS");
+                        return View();
+                    }
+                }
+                List<Cubo> cubosCarro = await this.repo.GetCubosCarritoAsync(idsCubosList);
+                int total = cubosCarro.Sum(x => x.Precio);
+                ViewData["PRECIOTOTAL"] = total;
+                return View(cubosCarro);
+            }
         }
     }
 }

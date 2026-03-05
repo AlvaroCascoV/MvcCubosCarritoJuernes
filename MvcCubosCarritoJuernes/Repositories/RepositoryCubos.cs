@@ -1,8 +1,10 @@
 ﻿using Humanizer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using MvcCubosCarritoJuernes.Data;
 using MvcCubosCarritoJuernes.Models;
 using MySql.Data.MySqlClient;
+using System;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -11,20 +13,37 @@ namespace MvcCubosCarritoJuernes.Repositories
 
     #region PROCEDURES
 
-//    DELIMITER //
+    //    DELIMITER //
 
-//CREATE PROCEDURE SP_INSERT_CUBO(
-//    IN p_idcubo      INT,
-//    IN p_nombre      VARCHAR(50),
-//    IN p_modelo      VARCHAR(50),
-//    IN p_marca       VARCHAR(50),
-//    IN p_imagen     VARCHAR(50),
-//    IN p_precio     INT
-//)
+    //CREATE PROCEDURE SP_INSERT_CUBO(
+    //    IN p_idcubo      INT,
+    //    IN p_nombre      VARCHAR(50),
+    //    IN p_modelo      VARCHAR(50),
+    //    IN p_marca       VARCHAR(50),
+    //    IN p_imagen     VARCHAR(50),
+    //    IN p_precio     INT
+    //)
+    //BEGIN
+
+    //INSERT INTO CUBOS(id_cubo, nombre, modelo, marca, imagen, precio)
+    //VALUES(p_idcubo, p_nombre, p_modelo, p_marca, p_imagen, p_precio);
+
+    //    END //
+
+    //    DELIMITER;
+
+//    DELIMITER //
+//    CREATE PROCEDURE SP_INSERT_COMPRA(
+//        IN p_idcompra      INT,
+//        IN p_idcubo         INT,
+//        IN p_cantidad      INT,
+//        IN p_precio       INT,
+//        IN p_fechapedido     DATETIME
+//    )
 //BEGIN
 
-//INSERT INTO CUBOS(id_cubo, nombre, modelo, marca, imagen, precio)
-//VALUES(p_idcubo, p_nombre, p_modelo, p_marca, p_imagen, p_precio);
+//INSERT INTO COMPRA(id_compra, id_cubo, cantidad, precio, fechapedido) VALUES
+//(p_idcompra, p_idcubo, p_idcubo, p_precio, p_fechapedido);
 
 //    END //
 
@@ -83,6 +102,30 @@ namespace MvcCubosCarritoJuernes.Repositories
                 cubo.Precio = precio;
                 this.context.SaveChanges();
             }
+        }
+        public async Task<List<Cubo>> GetCubosCarritoAsync(List<int> idsCubos)
+        {
+            var consulta = from datos in this.context.Cubos
+                           where idsCubos.Contains(datos.IdCubo)
+                           select datos;
+            return await consulta.ToListAsync();
+        }
+
+        public async Task InsertCompraAsync(int id_cubo, int cantidad, int precio)
+        {
+            var consulta = from datos in this.context.Compras
+                           select datos;
+            int id_compra = consulta.Max(x => x.IdCompra) + 1;
+            DateTime fechapedido = DateTime.Now;
+
+            string sql = "CALL SP_INSERT_COMPRA(@id_compra, @id_cubo, @cantidad, @precio, @fechapedido);";
+            MySqlParameter pamIdCompra = new MySqlParameter("@id_compra", id_compra);
+            MySqlParameter pamIdCubo = new MySqlParameter("@id_cubo", id_cubo);
+            MySqlParameter pamCantidad = new MySqlParameter("@cantidad", cantidad);
+            MySqlParameter pamPrecio = new MySqlParameter("@precio", precio);
+            MySqlParameter pamFechaPedido = new MySqlParameter("@fechapedido", fechapedido);
+
+            await this.context.Database.ExecuteSqlRawAsync(sql, pamIdCompra, pamIdCubo, pamCantidad, pamPrecio, pamFechaPedido);
         }
     }
 }
