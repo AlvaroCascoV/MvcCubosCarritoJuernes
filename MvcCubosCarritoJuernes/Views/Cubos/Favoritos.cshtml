@@ -1,0 +1,49 @@
+﻿
+@{
+    List<Cubo> favoritos = memoryCache.Get<List<Cubo>>("FAVORITOS");
+}
+
+<h1 style="color:blue">Cubos Favoritos</h1>
+<p>
+    <a asp-controller="Cubos" asp-action="Index">Volver a Cubos</a>
+</p>
+
+@if (favoritos != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IdCubo</th>
+                <th>Nombre</th>
+                <th>Modelo</th>
+                <th>Marca</th>
+                <th>Imagen</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in favoritos)
+            {
+                <tr>
+                    <td>@item.IdCubo</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Modelo</td>
+                    <td>@item.Marca</td>
+                    <td>
+                        <img src="~/images/cubos/@item.Imagen" alt="@item.Nombre" style="max-width: 100px; max-height: 100px;" />
+                    </td>
+                    <td>@item.Precio</td>
+                    <td>
+                        <a asp-action="Favoritos" asp-controller="Cubos" asp-route-ideliminar=@item.IdCubo"" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+    <h4 style="color:red">No tenemos favoritos</h4>
+}

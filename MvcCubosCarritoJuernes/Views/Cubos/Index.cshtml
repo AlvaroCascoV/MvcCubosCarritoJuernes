@@ -9,6 +9,12 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<p>
+    <a asp-action="Favoritos">Favoritos</a>
+</p>
+<p>
+    <a asp-action="Create">Carrito</a>
+</p>
 <table class="table">
     <thead>
         <tr>
@@ -33,8 +39,8 @@
             </td>
             <td>@item.Precio</td>
             <td>
-                <a asp-action="AnadirACarrito" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-success">Cart</a>
-                <a asp-action="Favorito" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-info">Fav</a>
+                <a asp-action="Almacenamiento" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-success">Cart</a>
+                <a asp-action="Almacenamiento" asp-controller="Cubos" asp-route-idfav="@item.IdCubo" class="btn btn-info">Fav</a>
                 
                 <a asp-action="Edit" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-warning">Edit</a>
                 <a asp-action="Details" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-primary">Details</a>
