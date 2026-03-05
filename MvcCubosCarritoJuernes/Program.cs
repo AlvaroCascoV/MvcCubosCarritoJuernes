@@ -1,7 +1,18 @@
+using Microsoft.EntityFrameworkCore;
+using MvcCoreUtilidades.Helpers;
+using MvcCubosCarritoJuernes.Data;
+using MvcCubosCarritoJuernes.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddTransient<HelperPathProvider>();
+
+builder.Services.AddTransient<IRepositoryCubos, RepositoryCubos>();
+builder.Services.AddDbContext<CubosContext>(options =>
+    options.UseMySQL(builder.Configuration.GetConnectionString("MysqlHospital")));
 
 var app = builder.Build();
 

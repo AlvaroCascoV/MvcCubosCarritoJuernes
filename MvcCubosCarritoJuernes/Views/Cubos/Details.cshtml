@@ -1,0 +1,33 @@
+﻿@model Cubo
+
+@if(Model == null)
+{
+    <h1>Not found</h1>
+}
+else
+{
+    
+
+
+<h1>Details</h1>
+
+<div>
+    <h4>Cubo</h4>
+    <hr />
+    <ul class="list-group">
+        <li class="list-group-item">ID: @Model.IdCubo</li>
+        <li class="list-group-item">Nombre: @Model.Nombre</li>
+        <li class="list-group-item">Modelo: @Model.Modelo</li>
+        <li class="list-group-item">Marca: @Model.Marca</li>
+        <li class="list-group-item">
+            <img src="~/images/cubos/@Model.Imagen" style="height:150px"/>
+        </li>
+        <li class="list-group-item">Precio: @Model.Precio</li>
+    </ul>
+</div>
+<div>
+    <a asp-action="Edit" asp-controller="Cubos" asp-route-idcubo="@Model.IdCubo" class="btn btn-warning">Edit</a>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+}

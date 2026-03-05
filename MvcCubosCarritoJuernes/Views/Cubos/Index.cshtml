@@ -1,0 +1,46 @@
+﻿@model IEnumerable<MvcCubosCarritoJuernes.Models.Cubo>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>IdCubo</th>
+            <th>Nombre</th>
+            <th>Modelo</th>
+            <th>Marca</th>
+            <th>Imagen</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>@item.IdCubo</td>
+            <td>@item.Nombre</td>
+            <td>@item.Modelo</td>
+            <td>@item.Marca</td>
+            <td>
+                <img src="~/images/cubos/@item.Imagen" alt="@item.Nombre" style="max-width: 100px; max-height: 100px;" />
+            </td>
+            <td>@item.Precio</td>
+            <td>
+                <a asp-action="AnadirACarrito" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-success">Cart</a>
+                <a asp-action="Favorito" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-info">Fav</a>
+                
+                <a asp-action="Edit" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-warning">Edit</a>
+                <a asp-action="Details" asp-controller="Cubos" asp-route-idcubo="@item.IdCubo" class="btn btn-primary">Details</a>
+                <a asp-action="Delete" asp-controller="Cubos" asp-route-idcubo=@item.IdCubo"" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
